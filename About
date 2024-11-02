@@ -1,0 +1,100 @@
+# README
+
+## HUB DAM Bathymetry and Volume Analysis Using Google Earth Engine (GEE) and Python
+
+This project provides tools for analyzing the bathymetry and calculating the volume of a hub dam, 
+with additional functionality to visualize and smooth terrain data in 3D. Using Google Earth Engine (GEE) for remote sensing data, 
+and Python for data processing and visualization, the code demonstrates techniques for calculating lake area, volume estimation, and bathymetric mapping.
+
+---
+
+### Key Features
+
+1. **Bathymetry and Area Calculation**:
+   - Utilizes `GLOBathy` dataset from GEE to acquire bathymetry data for a specified region.
+   - Calculates the area of the lake polygon and estimates lake volume based on depth values.
+
+2. **3D Terrain Visualization**:
+   - Exports bathymetric data as a `.tif` file for visualization and analysis.
+   - Smooths data with a Gaussian filter for enhanced terrain visualization.
+   - Uses `plotly` for an interactive 3D view of the lake's bathymetric profile.
+
+3. **Volume Calculation**:
+   - Uses pixel-based calculations to derive the lake volume by multiplying pixel area by depth at each point.
+
+---
+
+### Dependencies
+
+Ensure you have the following packages installed:
+
+```bash
+pip install geemap ee rioxarray scipy numpy matplotlib plotly
+```
+
+### Project Setup
+
+#### Authenticate with Google Earth Engine
+
+1. To run the project, authenticate with **Google Earth Engine** using:
+   ```python
+   import ee
+   ee.Authenticate()
+   ee.Initialize(project='your_project_name')
+   ```
+
+2. Replace `your_project_name` with the project name on your GEE account.
+
+### Code Breakdown
+
+1. **Define the Geometry for Area of Interest**:
+   - The target area is defined in a GeoJSON format, which specifies a polygon surrounding the lake.
+
+2. **Calculate Lake Area and Volume**:
+   - The lake area is calculated using GEE’s `area()` function, converted from square meters to square kilometers.
+   - Volume estimation uses a depth assumption or bathymetric data for precise calculations, employing the formula:
+     \[
+     \text{Volume} = \sum \text{Pixel Area} \times \text{Depth}
+     \]
+   
+3. **Bathymetry Visualization**:
+   - Using `geemap` and GEE, the bathymetry layer is clipped to the region of interest and styled with a color palette representing depth.
+   - A custom basemap (Esri satellite) provides context for the bathymetric data.
+
+4. **Export Bathymetry as a TIF File**:
+   - Bathymetry data is exported as a `.tif` file for further analysis and visualization.
+
+5. **Gaussian Smoothing for Terrain Visualization**:
+   - Depth data from the `.tif` file is smoothed using a Gaussian filter to remove noise and enhance visualization.
+   - This enables clearer 3D terrain visualization.
+
+6. **3D Plotting with Plotly**:
+   - The smoothed data is rendered in 3D using `plotly`, allowing for interactive exploration of lake depth profiles.
+
+### Example Commands
+
+**Run area and volume calculations**:
+```python
+# Calculate and print lake area in square kilometers
+area_sq_km = geometry.area().divide(1e6).getInfo()
+print(f"Area: {area_sq_km} square kilometers")
+```
+
+**Smooth bathymetric data**:
+```python
+# Smooth depth data with Gaussian filter
+ds = smoothen_dataArray('lake_terrain.tif', sigma=5)
+```
+
+**3D Plot the Lake Terrain**:
+```python
+# Plot 3D terrain
+plot_3D_terrain(ds.isel(band=0), colorscale='Earth', spatial_resolution=30, depth_scale=1)
+```
+
+### File Structure
+
+- `lake_bathymetry_analysis.py`: Main script containing all code for area, volume, and terrain visualization.
+- `lake_terrain.tif` and `lake_terrain2.tif`: Exported terrain files for 3D visualization (optional).
+- `README.md`: Documentation for project setup and usage.
+  
