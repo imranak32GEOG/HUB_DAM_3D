@@ -1,0 +1,533 @@
+
+
+!pip install -q rioxarray
+
+import geemap
+import ee
+import rioxarray as rxr
+import scipy as sp
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
+
+
+# Authenticate and initialize the Earth Engine module.
+ee.Authenticate()
+ee.Initialize(project='ee-imranak32ab')
+
+geojson  = {
+  "coordinates": [
+    [
+      [
+        67.138973287627493, 25.419288508877202
+      ],
+      [
+        67.088880170723499, 25.300919881935599
+      ],
+      [
+        67.076213114884894, 25.260632203184802
+      ],
+      [
+        67.126336309315903, 25.2112089125796
+      ],
+      [
+        67.154115656200602, 25.2286615759777
+      ],
+      [
+        67.174973496079602, 25.300003822511101
+      ],
+      [
+        67.204933018821606, 25.3705655594257
+      ],
+      [
+        67.207443400570696, 25.394084636030399
+      ],
+      [
+        67.138973287627493, 25.419288508877202
+      ]
+    ]
+  ],
+  "type": "Polygon"
+}
+
+
+geometry = ee.Geometry(geojson)
+
+import ee
+import geemap
+
+# Initialize the Earth Engine module
+ee.Initialize()
+
+# Define the polygon geometry using the geojson coordinates
+geojson = {
+  "coordinates": [
+    [
+      [
+        67.138973287627493, 25.419288508877202
+      ],
+      [
+        67.088880170723499, 25.300919881935599
+      ],
+      [
+        67.076213114884894, 25.260632203184802
+      ],
+      [
+        67.126336309315903, 25.2112089125796
+      ],
+      [
+        67.154115656200602, 25.2286615759777
+      ],
+      [
+        67.174973496079602, 25.300003822511101
+      ],
+      [
+        67.204933018821606, 25.3705655594257
+      ],
+      [
+        67.207443400570696, 25.394084636030399
+      ],
+      [
+        67.138973287627493, 25.419288508877202
+      ]
+    ]
+  ],
+  "type": "Polygon"
+}
+
+# Create the geometry
+geometry = ee.Geometry(geojson)
+
+# Calculate the area in square kilometers
+area_sq_km = geometry.area().divide(1e6).getInfo()  # divide by 1e6 to convert from m² to km²
+
+print(f"Area: {area_sq_km} square kilometers")
+
+"""Area: 167.52803702602358 square kilometers[link text](https://)"""
+
+import ee
+import geemap
+
+# Initialize the Earth Engine module
+ee.Initialize()
+
+# Define the polygon geometry using the geojson coordinates
+geojson = {
+  "coordinates": [
+    [
+      [
+        67.138973287627493, 25.419288508877202
+      ],
+      [
+        67.088880170723499, 25.300919881935599
+      ],
+      [
+        67.076213114884894, 25.260632203184802
+      ],
+      [
+        67.126336309315903, 25.2112089125796
+      ],
+      [
+        67.154115656200602, 25.2286615759777
+      ],
+      [
+        67.174973496079602, 25.300003822511101
+      ],
+      [
+        67.204933018821606, 25.3705655594257
+      ],
+      [
+        67.207443400570696, 25.394084636030399
+      ],
+      [
+        67.138973287627493, 25.419288508877202
+      ]
+    ]
+  ],
+  "type": "Polygon"
+}
+
+# Create the geometry
+geometry = ee.Geometry(geojson)
+
+# Calculate the area in square meters
+area_sq_m = geometry.area().getInfo()
+
+# Define average depth in meters
+average_depth = 3  # meters         assumption only
+
+# Calculate the volume in cubic meters
+volume_cubic_m = area_sq_m * average_depth
+
+print(f"Area: {area_sq_m / 1e6} square kilometers")
+print(f"Volume: {volume_cubic_m} cubic meters")
+
+globathy = ee.Image("projects/sat-io/open-datasets/GLOBathy/GLOBathy_bathymetry")
+
+globathy = globathy.rename('Depth_m').unmask(0)
+
+import geemap
+import ee
+
+# Initialize Earth Engine
+ee.Initialize()
+
+# Define the geometry from your geojson data
+geojson = {
+  "coordinates": [
+    [
+      [
+        67.138973287627493, 25.419288508877202
+      ],
+      [
+        67.088880170723499, 25.300919881935599
+      ],
+      [
+        67.076213114884894, 25.260632203184802
+      ],
+      [
+        67.126336309315903, 25.2112089125796
+      ],
+      [
+        67.154115656200602, 25.2286615759777
+      ],
+      [
+        67.174973496079602, 25.300003822511101
+      ],
+      [
+        67.204933018821606, 25.3705655594257
+      ],
+      [
+        67.207443400570696, 25.394084636030399
+      ],
+      [
+        67.138973287627493, 25.419288508877202
+      ]
+    ]
+  ],
+  "type": "Polygon"
+}
+
+geometry = ee.Geometry(geojson)
+
+# Define the bathymetry data (assuming globathy is already defined as a GEE Image)
+visParams = {
+    "min": 0,
+    "max": 20,
+    'palette': ['#eff3ff','#c6dbef','#9ecae1','#6baed6','#3182bd','#08519c']
+}
+
+# Initialize the map
+Map = geemap.Map()
+
+# Set the ESRI Satellite basemap
+Map.add_basemap('Esri.WorldImagery')
+
+# Add the bathymetry data, clipped to the region of interest
+Map.addLayer(globathy.clip(geometry), visParams, 'Global Bathymetry')
+
+# Add the bounding area of interest geometry for reference
+Map.addLayer(geometry, {}, 'Region of Interest')
+
+# Center and display the map
+Map.centerObject(geometry, zoom=12)
+Map
+
+# Import geemap and initialize the map
+#Map = geemap.Map()
+
+# Set visualization parameters
+visParams = {
+    "min": 0,
+    "max": 20,
+    'palette': ['#eff3ff','#c6dbef','#9ecae1','#6baed6','#3182bd','#08519c']
+}
+
+# Add global bathymetry layer
+Map.addLayer(globathy.clip(geometry), visParams, 'Global Bathymetry')
+
+# Show bounding area of interest geometry
+Map.addLayer(geometry)
+
+# Set a custom basemap, for example, Esri satellite view
+
+
+# Center the map on the area of interest
+Map.centerObject(geometry, zoom=12)
+
+# Display the map
+Map
+
+"""Calculate the Volume of the Lake
+
+To calculate the volume of the lake, we will use a simple approach: the sum of the area of each pixel multiplied by the depth of each pixel. This may be expressed mathematically as follows:
+
+This equation will return the volume at each pixel. Before calculating the area, we will mask out the values that are having zero depths or in other words masking out pixels where lake is not present. The code that follows shows you how to accomplish this:
+"""
+
+import matplotlib.pyplot as plt
+
+# Given geojson data
+geojson  = {
+  "coordinates": [
+    [
+      [
+        67.138973287627493, 25.419288508877202
+      ],
+      [
+        67.088880170723499, 25.300919881935599
+      ],
+      [
+        67.076213114884894, 25.260632203184802
+      ],
+      [
+        67.126336309315903, 25.2112089125796
+      ],
+      [
+        67.154115656200602, 25.2286615759777
+      ],
+      [
+        67.174973496079602, 25.300003822511101
+      ],
+      [
+        67.204933018821606, 25.3705655594257
+      ],
+      [
+        67.207443400570696, 25.394084636030399
+      ],
+      [
+        67.138973287627493, 25.419288508877202
+      ]
+    ]
+  ],
+  "type": "Polygon"
+}
+
+
+geometry = ee.Geometry(geojson)
+
+# Extract coordinates from geojson
+coordinates = geojson['coordinates'][0]
+
+# Separate the coordinates into two lists: longitude and latitude
+longitudes, latitudes = zip(*coordinates)
+
+# Create the plot
+plt.figure(figsize=(10, 8))
+plt.plot(longitudes, latitudes, marker='o')
+
+# Add title and labels
+plt.title('GeoJSON Polygon')
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+
+# Show the plot
+plt.grid(True)
+plt.show()
+
+## mask the values where depths are 0
+area_mask = globathy.gt(0)
+
+## Calculate the area of each pixel in m2, rename the band as area_m2
+area = area_mask.multiply(ee.Image.pixelArea()).rename('area_m2')
+
+## Now calculate the volume of each pixel in m3, rename the band as volume_m3
+volume = area.multiply(globathy).rename("volume_m3")
+
+volume = volume.select("volume_m3")
+totalVolume = volume.reduceRegion(
+    reducer = ee.Reducer.sum(),
+    geometry = geometry,
+    scale=30,
+    maxPixels = 1e10
+)
+
+## Total volume in ML - MegaLiter (1ML = 1e6 L)
+totalVolume = ee.Number(totalVolume.get('volume_m3')).divide(1e3).round()
+
+globath_depths = globathy.multiply(-1)
+
+
+
+spatial_resolution = 30
+geemap.ee_export_image(
+    globath_depths, filename="lake_terrain.tif", scale=spatial_resolution, region=geometry, file_per_band=False
+)
+
+
+
+spatial_resolution = 30
+geemap.ee_export_image(
+    globath_depths, filename="lake_terrain2.tif", scale=spatial_resolution, region=geometry, file_per_band=False
+)
+
+def smoothen_dataArray(tif_file, sigma = 10):
+    '''
+    This function reads an tif image containing the terrain data
+    Smoothens the elevation data using gaussian filter
+    Input: .tif file
+    returns: a processed Xarray.Dataset containing the terrain data
+    '''
+    da = rxr.open_rasterio(filename=tif_file)
+    da_vals = da.isel(band=0).values ## Select the first band of the image
+    # Apply gaussian filter, with sigmas as variables. Higher sigma = more smoothing and more calculations. Downside: min and max values do change due to smoothing
+    sigma = [sigma, sigma] ## Sigma values in x and y direction
+    z_smoothed = sp.ndimage.gaussian_filter(da_vals, sigma)
+
+    da.data = np.expand_dims(z_smoothed, axis=0)
+    return da
+
+ds = smoothen_dataArray('lake_terrain.tif', sigma=5) ## XarrayDataset
+da = ds.isel(band=0) ## Select the first array from the Xarray.Dataset
+
+def plot_3D_terrain(xr_array, colorscale = 'Earth', spatial_resolution=30, depth_scale=1):
+
+    '''
+    Plots an array data in 3D.
+    Input: Xarray.DataArray
+    Returns: plotly figure representing the 3D terrain data
+    '''
+
+    Z = xr_array.values ## Z are the elevation/depth values
+    Y = xr_array['y'].values ## Y - latitude values
+    X = xr_array['x'].values ## X - longitude values
+    x_ratio, y_ratio = xr_array.shape
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Surface(
+            z=Z,
+            x=X,
+            y=Y,
+            colorscale = colorscale,
+            hovertemplate ='<b>Depth</b>: %{z:.2f} m',
+            name=""
+        )
+    )
+
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=30, b=0),
+        title = f"Hub Dam Topography | Total Calculated Volume: {totalVolume.getInfo()} ML",
+        plot_bgcolor="rgba(0, 0, 0, 0)",   # Transparent plot background
+    )
+
+    # Set the box aspect ratio (equal scales for all axes)
+    fig.update_scenes(
+        aspectratio=dict(x=spatial_resolution, y=spatial_resolution,z=depth_scale),
+        xaxis=dict(showticklabels=False, title="", showgrid=False),
+        yaxis=dict(showticklabels=False, title="", showgrid=False),
+        zaxis=dict(showticklabels=False, title="Depth (m)<br>→", showgrid=False)
+    )
+
+    return fig
+
+def matplotlib_to_plotly(cmap, pl_entries):
+    '''Converts a matplolib colorscale to plotly colorscale'''
+    h = 1.0/(pl_entries-1)
+    pl_colorscale = []
+
+    for k in range(pl_entries):
+        C = list(map(np.uint8, np.array(cmap(k*h)[:3])*255))
+        pl_colorscale.append([k*h, 'rgb'+str((C[0], C[1], C[2]))])
+
+    return pl_colorscale
+
+!pip install matplotlib
+import matplotlib
+import matplotlib.cm
+
+## Convert colorscales from matplotlib to plotly colorscales
+terrain_cmap = matplotlib.cm.get_cmap('winter')
+terrain = matplotlib_to_plotly(terrain_cmap, 255)
+
+## Plot the 3D terrain
+fig = plot_3D_terrain(da, colorscale=terrain)
+fig.show()
+
+# First, install rasterio if not already installed
+!pip install rasterio matplotlib
+
+import matplotlib
+import matplotlib.pyplot as plt
+import rasterio
+from rasterio.transform import from_origin
+import numpy as np
+import xarray as xr
+
+# Function to plot 3D terrain
+def plot_3D_terrain(xr_array, colorscale, elev_scale=1.0):
+    """
+    Plot the 3D terrain of the lake using matplotlib's 3D plotting capabilities.
+
+    Input:
+    - xr_array: Xarray DataArray containing Z values representing depth.
+    - colorscale: The color scale (converted from matplotlib to Plotly if required).
+    - elev_scale: Scaling factor for elevation exaggeration (default is 1.0).
+    """
+    Z = xr_array.values * elev_scale  # Scaling the elevation for exaggeration
+    X = xr_array['x'].values
+    Y = xr_array['y'].values
+
+    # Create a meshgrid for X and Y to match the shape of Z
+    X, Y = np.meshgrid(X, Y)  # This line is added to fix the shape mismatch
+
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Plot the surface
+    surf = ax.plot_surface(X, Y, Z, cmap=colorscale, edgecolor='none')
+
+    # Add a colorbar
+    fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10, label='Depth (m)')
+
+    ax.set_title("3D Terrain of the Lake")
+    ax.set_xlabel('Longitude')
+    ax.set_ylabel('Latitude')
+    ax.set_zlabel('Elevation (Depth in m)')
+    plt.show()
+
+# Plotting 3D terrain using 'winter' colormap from matplotlib
+terrain_cmap = matplotlib.cm.get_cmap('winter')
+plot_3D_terrain(da, colorscale=terrain_cmap)
+
+pip install mayavi
+
+!pip install configobj
+
+from mayavi import mlab
+import numpy as np
+
+pip install PyQt5
+
+!pip install PyQt5  # Or !pip install PySide2 or !pip install wxPython
+
+pip install PySide2
+
+from mayavi import mlab
+import numpy as np
+
+def plot_contour_map(xr_array, levels=10, cmap='Blues'):
+    """
+    Plot a contour map for the bathymetry data.
+
+    Input: Xarray.DataArray (Z values representing depth)
+    """
+    Z = xr_array.values
+    X = xr_array['x'].values
+    Y = xr_array['y'].values
+
+    plt.figure(figsize=(10, 8))
+    cp = plt.contour(X, Y, Z, levels=levels, cmap=cmap)
+    plt.clabel(cp, inline=True, fontsize=10)
+    plt.title('Bathymetry Contour Map')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.colorbar(cp, label='Depth (m)')
+    plt.grid(True)
+    plt.show()
+
+# Plot contour map
+plot_contour_map(da, levels=20)
